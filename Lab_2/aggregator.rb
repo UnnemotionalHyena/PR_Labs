@@ -3,6 +3,9 @@
 require 'typhoeus'
 require 'pry'
 require 'json'
+require 'csv'
+require 'ox'
+require './device.rb'
 
 def check_responces(requests)
   responces = []
@@ -18,17 +21,17 @@ def check_responces(requests)
       end
       return []
     end
-    responces << request.response.body
+    responces << request
   end
   responces
 end
 
 url = "https://desolate-ravine-43301.herokuapp.com"
+responces = []
 
 loop do
   response      = Typhoeus.post(url)
   session_key   = response.headers["Session"]
-  session_key   = "jhueuewrdhfkjsadhfakjfd"
   response_body = JSON.parse(response.body)
   hydra         = Typhoeus::Hydra.hydra
 
@@ -46,4 +49,20 @@ loop do
   break if !responces.empty?
 end
 
-responces  # Need to parse depending of type, and refactor the code
+devices = []
+responces.each do |response|
+  case response.response.headers["Content-Type"]
+  when /csv/i
+    CSV.parse(response.response.body).drop(1).each do |data|
+      devices << Device.parse_csv(data)
+    end
+  when /json/i
+    devices << Device.parse_json(JSON.parse(response.response.body))
+  when /xml/i
+    devices << Device.parse_xml(Ox.load(response.response.body, mode: :hash))
+  else
+    next
+  end
+end
+
+devices # NOTE: sort devices in categories; finish the program
