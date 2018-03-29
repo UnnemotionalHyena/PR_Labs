@@ -59,10 +59,18 @@ responces.each do |response|
   when /json/i
     devices << Device.parse_json(JSON.parse(response.response.body))
   when /xml/i
-    devices << Device.parse_xml(Ox.load(response.response.body, mode: :hash))
+    devices << Device.parse_xml(Ox.load(response.response.body, mode: :hash)[:device])
   else
     next
   end
 end
 
-devices # NOTE: sort devices in categories; finish the program
+["Temperature sensor", "Humidity sensor", "Motion sensor",
+ "Alien Presence detector", "Dark Matter detector", "Unknown"].each do |category|
+  puts "\n\t#{category}", ""
+  devices.each do |device|
+    if category == device.category
+      device.show_values
+    end
+  end
+end
