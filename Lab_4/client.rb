@@ -2,28 +2,34 @@ require 'socket'
 
 socket = TCPSocket.open( "localhost", 8090 )
 
-puts "Please enter your username to establish a connection..."
-
-a = Thread.new do
+connection_tread = Thread.new do
   loop do
-    message = $stdin.gets.chomp
-    socket.puts message
-  end
-end
-
-b = Thread.new do
-  loop do
-    response = socket.gets.chomp
-    puts "#{response}"
-    if response.eql?'quit'
+    begin
+      message = $stdin.gets.chomp
+      socket.puts message
+    rescue IOError => e
+      puts e
       socket.close
-      return
+      exit
     end
   end
 end
 
-a.run
-b.run
+dialog_thread = Thread.new do
+  loop do
+    response = socket.gets.chomp
+    puts "#{response}"
 
-a.join
-b.join
+
+    if response =~ /quit session/
+      socket.close
+      exit
+    end
+  end
+end
+
+connection_tread.run
+dialog_thread.run
+
+connection_tread.join
+dialog_thread.join
