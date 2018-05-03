@@ -1,7 +1,4 @@
 Commands supported by the server:
-* `/hello <param>` - Prints "Hello <param>"
-
-  Example: `Hello World`
   
 * `/help` - Shows all available commands
 
