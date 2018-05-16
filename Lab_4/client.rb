@@ -1,6 +1,6 @@
 require 'socket'
 
-socket = TCPSocket.open( "localhost", 8090 )
+socket = TCPSocket.open( "localhost", 8080 )
 
 connection_tread = Thread.new do
   loop do

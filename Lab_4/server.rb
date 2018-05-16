@@ -1,5 +1,4 @@
 require 'socket'
-require 'pry'
 require 'levenshtein'
 
 @connection_name = {}
